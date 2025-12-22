@@ -17,5 +17,10 @@
   "bugs": {
     "url": "https://github.com/BarraHarrison/Upgradeable-ERC20-Solidity/issues"
   },
-  "homepage": "https://github.com/BarraHarrison/Upgradeable-ERC20-Solidity#readme"
+  "homepage": "https://github.com/BarraHarrison/Upgradeable-ERC20-Solidity#readme",
+  "devDependencies": {
+    "hardhat": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
 }
