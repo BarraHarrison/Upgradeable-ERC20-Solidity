@@ -1,2 +1,5 @@
 node_modules/
 ignition/
+artifacts/
+cache/
+types/
