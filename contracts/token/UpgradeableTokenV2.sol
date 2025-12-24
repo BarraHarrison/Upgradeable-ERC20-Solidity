@@ -28,11 +28,19 @@ contract UpgradeableTokenV2 is UpgradeableTokenV1 {
     /**
      * @dev Enforce cap on minting.
      */
-    function _mint(address to, uint256 amount) internal override {
-        if (totalSupply() + amount > _cap) {
-            revert("ERC20: cap exceeded");
+    function _update(
+        address from,
+        address to,
+        uint256 value
+    ) internal override {
+        // Minting case
+        if (from == address(0)) {
+            if (totalSupply() + value > _cap) {
+                revert("ERC20: cap exceeded");
+            }
         }
-        super._mint(to, amount);
+
+        super._update(from, to, value);
     }
 
     function version() external pure override returns (string memory) {
