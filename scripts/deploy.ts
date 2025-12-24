@@ -17,7 +17,7 @@ async function main() {
         ],
         {
             kind: "uups",
-            initializer: "initializer",
+            initializer: "initialize",
         }
     );
 
