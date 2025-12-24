@@ -125,7 +125,7 @@ contract UpgradeableTokenV1 is
      * @notice Human-readable contract version (useful in tests + upgrades).
      */
 
-    function version() external pure returns (string memory) {
+    function version() external pure virtual returns (string memory) {
         return "V1";
     }
 
