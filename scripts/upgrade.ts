@@ -9,8 +9,7 @@ async function main() {
 
     const upgraded = await upgrades.upgradeProxy(proxyAddress, TokenV2, {
         unsafeAllow: [
-            "missing-initializer",
-            "unsafe-allow-parent-initializers",
+            "missing-initializer-call"
         ],
     });
 
