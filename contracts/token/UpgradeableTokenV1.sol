@@ -96,6 +96,7 @@ contract UpgradeableTokenV1 is
     function _update(address from, address to, uint256 value)
         internal
         override
+        virtual
         whenNotPaused
     {
         super._update(from, to, value);
