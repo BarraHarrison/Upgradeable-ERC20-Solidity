@@ -17,10 +17,12 @@ contract UpgradeableTokenV2 is UpgradeableTokenV1 {
     uint256 private _cap;
 
     /// @custom:oz-upgrades-validate-as-initializer
+    /// @custom:oz-upgrades-unsafe-allow-parent-initializers
     function initializeV2(uint256 cap_) external reinitializer(2) {
         require(cap_ > 0, "Cap must be > 0");
         _cap = cap_;
     }
+
 
     function cap() external view returns (uint256) {
         return _cap;
