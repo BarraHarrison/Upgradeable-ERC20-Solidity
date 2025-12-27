@@ -1,57 +1,138 @@
-# Sample Hardhat 3 Beta Project (`mocha` and `ethers`)
+# Upgradeable ERC-20 Token (UUPS Pattern)
 
-This project showcases a Hardhat 3 Beta project using `mocha` for tests and the `ethers` library for Ethereum interactions.
+This project is a **protocol-grade upgradeable ERC-20 token** built with **Solidity, Hardhat, and OpenZeppelin**. It demonstrates how real-world Ethereum protocols design, deploy, and safely upgrade smart contracts **without redeploying the token or losing on-chain state**.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+The focus of this repository is on **correct upgrade architecture, storage safety, and validator-aware upgrades**.
 
-## Project Overview
+---
 
-This example project includes:
+## 🎯 Project Goals
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using `mocha` and ethers.js
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+The primary goals of this project were to:
 
-## Usage
+* Implement a **UUPS (Universal Upgradeable Proxy Standard)** ERC-20 token
+* Separate **proxy and implementation logic** correctly
+* Demonstrate **safe upgrades across contract versions**
+* Extend storage without breaking existing state
+* Use **initializers and reinitializers correctly**
+* Enforce **role-based upgrade control**
+* Understand and responsibly handle **OpenZeppelin upgrade validators**
 
-### Running Tests
+This project mirrors how **production protocols** manage upgrades, not how tutorials simplify them.
 
-To run all the tests in the project, execute the following command:
+---
 
-```shell
-npx hardhat test
-```
+## 🧱 Architecture Overview
 
-You can also selectively run the Solidity or `mocha` tests:
+### UUPS Proxy Pattern
 
-```shell
-npx hardhat test solidity
-npx hardhat test mocha
-```
+* A **single proxy contract** holds all user balances and state
+* Implementation contracts contain logic only
+* The proxy delegates calls to the current implementation
+* Upgrades replace the implementation **without changing the proxy address**
 
-### Make a deployment to Sepolia
+### Proxy vs Implementation
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+* **Proxy address**: what users interact with
+* **Implementation address**: logic contract that can be replaced
+* Users never need to migrate balances or change addresses
 
-To run the deployment to a local chain:
+---
 
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
-```
+## 🔐 Access Control & Upgrade Safety
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+* Uses **OpenZeppelin AccessControl**
+* Only accounts with `UPGRADER_ROLE` can authorize upgrades
+* `_authorizeUpgrade()` enforces upgrade permissions
+* Prevents unauthorized or accidental upgrades
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+---
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+## 🧠 Versioning & Upgrades
 
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
+### Version 1 – `UpgradeableTokenV1`
 
-After setting the variable, you can run the deployment with the Sepolia network:
+* Standard ERC-20 functionality
+* Pausable transfers
+* Role-based minting and burning
+* Initializer replaces constructor
+* Parent initializers executed exactly once
 
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+### Version 2 – `UpgradeableTokenV2`
+
+* Adds a **total supply cap**
+* Introduces **new storage safely**
+* Uses `reinitializer(2)` for upgrade-specific initialization
+* Extends logic via the ERC-20 v5 `_update` hook
+* Preserves all balances, supply, and roles from V1
+
+---
+
+## 🧬 Storage Safety
+
+This project strictly follows upgrade-safe storage rules:
+
+* No storage reordering
+* No storage deletion
+* New state variables appended only
+* Explicit storage gaps reserved for future upgrades
+
+As a result:
+
+* Existing balances remain intact
+* Total supply remains unchanged
+* Roles persist across upgrades
+
+---
+
+## 🛠 OpenZeppelin Validator Awareness
+
+The upgrade process deliberately engages with OpenZeppelin’s static validator:
+
+* Reinitializers are explicitly documented
+* Parent initializers are intentionally *not* re-called
+* `unsafeAllow` flags are used **surgically**, not blindly
+* Validator warnings are understood, reviewed, and accepted with intent
+
+This reflects how real protocols handle **validator limitations vs runtime reality**.
+
+---
+
+## ✅ What This Project Demonstrates
+
+By completing this project, I have demonstrated:
+
+* Correct use of the **UUPS proxy pattern**
+* Proper separation of **proxy vs implementation**
+* Safe **storage extension across versions**
+* Correct use of **initializer vs reinitializer**
+* Controlled upgrades via `_authorizeUpgrade`
+* Understanding of **OpenZeppelin validator rules**
+* When and how to use `unsafeAllow` **responsibly**
+
+This is **protocol-grade Solidity engineering**, not tutorial-level experimentation.
+
+---
+
+## 🚀 Tooling & Stack
+
+* Solidity ^0.8.x
+* Hardhat (v2)
+* OpenZeppelin Contracts & Contracts-Upgradeable
+* Ethers.js
+* TypeScript
+* Local Hardhat node for persistent upgrades
+
+---
+
+## 📌 Final Notes
+
+This repository is intended as:
+
+* A **learning milestone** in advanced Solidity
+* A **portfolio-ready example** of upgradeable contract design
+* A reference implementation for future protocol work
+
+The patterns used here are the same ones employed by major Ethereum protocols in production.
+
+---
