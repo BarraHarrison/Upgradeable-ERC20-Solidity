@@ -7,7 +7,13 @@ async function main() {
 
     console.log("Upgrading proxy…");
 
-    const upgraded = await upgrades.upgradeProxy(proxyAddress, TokenV2);
+    const upgraded = await upgrades.upgradeProxy(proxyAddress, TokenV2, {
+        unsafeAllow: [
+            "missing-initializer",
+            "unsafe-allow-parent-initializers",
+        ],
+    });
+
     await upgraded.waitForDeployment();
 
     console.log("✅ Proxy upgraded");
